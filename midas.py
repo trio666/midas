@@ -28,7 +28,15 @@ class MidasBot:
             'Origin': 'https://prod-tg-app.midas.app',
             'Referer': 'https://prod-tg-app.midas.app/',
         }
+        # Set rotating proxy
+        self.proxy = {
+            'http': 'http://username:password@rotating.proxy.io:6666',
+            'https': 'http://username:password@rotating.proxy.io:6666'
+        }
+        # Initialize scraper with proxy
         self.scraper = cloudscraper.create_scraper()
+        self.scraper.proxies.update(self.proxy)
+
         self.start_color = (0, 0, 255)
         self.end_color = (128, 0, 128)
 
@@ -41,6 +49,15 @@ class MidasBot:
         print(Fore.GREEN + '[#] Welcome & Enjoy !', Fore.RESET)
         print(Fore.YELLOW + '[#] Having Troubles? PM Telegram [t.me/fakinsit]', Fore.RESET)
         print('')
+
+    def check_ip(self):
+        timestamp = Fore.MAGENTA + get_formatted_time() + Fore.RESET
+        try:
+            response = self.scraper.get('https://api.ipify.org?format=json')
+            ip_info = response.json()
+            print(f"[{timestamp}] - IP Address: {ip_info['ip']}")
+        except Exception as e:
+            print(f"[{timestamp}] - Failed to retrieve IP: {e}")
 
     def load_query_ids(self):
         timestamp = Fore.MAGENTA + get_formatted_time() + Fore.RESET
@@ -139,6 +156,7 @@ class MidasBot:
         self.turudek(1 * 60 * 60)
 
     def perform_tasks(self, token):
+        self.check_ip()
         self.check_in(token)
         self.get_user_info(token)
         self.play_game_if_needed(token)
